@@ -25,7 +25,10 @@ $cave = array_reduce(explode("\n", $input), function ($cave, $lineToParse) {
     return $cave;
 }, new Cave());
 
-$cave->pour();
+//$m = memory_get_usage();
+echo $cave->pour() . "\n\n";
+//$m2 = memory_get_usage();
+//var_dump($m2 - $m);
 echo $cave;
 
 
