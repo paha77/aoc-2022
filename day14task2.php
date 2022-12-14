@@ -1,7 +1,7 @@
 <?php
 
-$input = file_get_contents(__DIR__ . '/test.txt');
-//$input = file_get_contents(__DIR__ . '/input1.txt');
+//$input = file_get_contents(__DIR__ . '/test.txt');
+$input = file_get_contents(__DIR__ . '/input1.txt');
 $cave = array_reduce(explode("\n", $input), function ($cave, $lineToParse) {
     /** @var Cave $cave */
     if (preg_match_all('/([0-9]+,[0-9]+)?/', $lineToParse, $matches)) {
@@ -25,6 +25,9 @@ $cave = array_reduce(explode("\n", $input), function ($cave, $lineToParse) {
     return $cave;
 }, new Cave());
 
+// draw an extra line
+$cave->drawLine([$cave->lowestX(), $cave->highestY() + 2], [$cave->highestX(), $cave->highestY() + 2]);
+
 $cave->pour();
 echo $cave;
 
@@ -45,6 +48,10 @@ class Cave
         do {
             $this->points[$this->sandPouringPoint[0]][$this->sandPouringPoint[1]] = 'o';
             if (!$this->fall($this->sandPouringPoint)) {
+                break;
+            }
+            // full
+            if (isset($this->points[$this->sandPouringPoint[0]][$this->sandPouringPoint[1]])) {
                 break;
             }
             $sandsPoured++;
@@ -94,11 +101,21 @@ class Cave
 
     private function __canFallDownAndLeft(array $point): bool
     {
+        // extend floor
+        if ($point[0] === $this->lowestX()) {
+            $this->points[$point[0] - 1][$this->highestY()] = '#';
+            $this->__rearrange();
+        }
         return !isset($this->points[$point[0] - 1][$point[1] + 1]);
     }
 
     private function __canFallDownAndRight(array $point): bool
     {
+        // extend floor
+        if ($point[0] === $this->highestX()) {
+            $this->points[$point[0] + 1][$this->highestY()] = '#';
+            $this->__rearrange();
+        }
         return !isset($this->points[$point[0] + 1][$point[1] + 1]);
     }
 
@@ -173,22 +190,22 @@ class Cave
         }
     }
 
-    private function lowestX()
+    public function lowestX()
     {
         return min(array_keys($this->points));
     }
 
-    private function highestX()
+    public function highestX()
     {
         return max(array_keys($this->points));
     }
 
-    private function lowestY(): int
+    public function lowestY(): int
     {
         return 0;
     }
 
-    private function highestY(): int
+    public function highestY(): int
     {
         return array_reduce($this->points, function ($highestY, $rows) {
             return max($highestY, max(array_keys($rows)));
