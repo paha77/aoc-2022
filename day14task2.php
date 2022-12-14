@@ -36,6 +36,10 @@ class Cave
 {
     public $points = [];
     public $sandPouringPoint;
+    private $highestX;
+    private $lowestX;
+    private $highestY;
+    private $lowestY;
 
     public function __construct()
     {
@@ -55,6 +59,9 @@ class Cave
                 break;
             }
             $sandsPoured++;
+
+            echo $this;
+
         } while (true);
 
         return $sandsPoured;
@@ -150,6 +157,8 @@ class Cave
             $highestY
         );
 
+        return $ret;
+
         for ($y = $lowestY; $y <= $highestY; $y++) {
 
             $row = '';
@@ -184,6 +193,7 @@ class Cave
 
     private function __rearrange()
     {
+        $this->highestX = $this->lowestX = $this->highestY = $this->lowestY = null;
         ksort($this->points);
         foreach ($this->points as $x => $rows) {
             ksort($this->points[$x]);
@@ -192,21 +202,33 @@ class Cave
 
     public function lowestX()
     {
+        if (!is_null($this->lowestX)) {
+            return $this->lowestX;
+        }
         return min(array_keys($this->points));
     }
 
     public function highestX()
     {
+        if (!is_null($this->highestX)){
+            return $this->highestX;
+        }
         return max(array_keys($this->points));
     }
 
     public function lowestY(): int
     {
+        if (!is_null($this->lowestY)){
+            return $this->lowestY;
+        }
         return 0;
     }
 
     public function highestY(): int
     {
+        if (!is_null($this->highestY)){
+            return $this->highestY;
+        }
         return array_reduce($this->points, function ($highestY, $rows) {
             return max($highestY, max(array_keys($rows)));
         }, 0);
