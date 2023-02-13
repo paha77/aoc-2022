@@ -60,7 +60,7 @@ class Cave
             }
             $sandsPoured++;
 
-            echo $this;
+            echo $sandsPoured . "\n";
 
         } while (true);
 
